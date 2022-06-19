@@ -1,41 +1,48 @@
- // SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT
 pragma solidity <= 0.86;
-
+pragma experimental ABIEncoderV2;
 
 contract lottery {
-    
     address public owner;
+    address public winner;
     address[] participants ;
 
-    // Eventos 
-    event lottery_done(bytes32);
+    // Events
+    event lottery_done(uint);
     event user_registry(string);
-    // Constructor 
+
+    //??
     constructor () public {
         owner = msg.sender;
     }
     
-
-        // Control de las funciones ejecutables por el profesor
     modifier OnlyOwner(address _address){
-        // Requiere que la direccion introducido por parametro sea igual al owner del contrato
         require(_address == owner, "Only Owner!");
         _;
     }
 
-
-        // Funcion para pedir una revision del examen
     function RegisterInLottery(address _address) public {
-        // Almacenamiento de la identidad del alumno en un array
         participants.push(_address);
-        // Emision del evento 
         emit user_registry("User successfully registered");
     }
     
-    // Funcion para ver los alumnos que han solicitado revision de examen
-    function CheckParticipants() public view OnlyOwner(msg.sender) returns (address[]){
-        // Devolver las identidades de los alumnos
+    function CheckParticipants() public view OnlyOwner(msg.sender) returns (address[] memory){
         return participants;
     }
     
+        // Solidity pseudo-random function:
+    function random() private view returns (uint) {
+    // sha3 and now have been deprecated
+     return uint(keccak256(abi.encodePacked(block.difficulty, block.timestamp, participants)));
+    // convert hash to integer
+    // players is an array of entrants
+    }
+
+    // invoke random function in a pickWinner example function
+    function pickWinner() public OnlyOwner(msg.sender) returns (address) {
+        uint index = random()%participants.length;
+        winner =  participants[index];
+        return winner;
+    }
+
 }
