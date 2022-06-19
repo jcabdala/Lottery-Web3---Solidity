@@ -8,7 +8,7 @@ contract lottery {
     address[] participants ;
 
     // Events
-    event lottery_done(uint);
+    event lottery_done(string, address);
     event user_registry(string);
 
     //??
@@ -30,18 +30,16 @@ contract lottery {
         return participants;
     }
     
-        // Solidity pseudo-random function:
+    // Solidity pseudo-random function:
     function random() private view returns (uint) {
-    // sha3 and now have been deprecated
      return uint(keccak256(abi.encodePacked(block.difficulty, block.timestamp, participants)));
-    // convert hash to integer
-    // players is an array of entrants
     }
 
     // invoke random function in a pickWinner example function
     function pickWinner() public OnlyOwner(msg.sender) returns (address) {
         uint index = random()%participants.length;
         winner =  participants[index];
+        emit lottery_done("We have a winner", winner);
         return winner;
     }
 
